@@ -1,4 +1,8 @@
+---
+---
+
 # penniless pilgrim riddle
 
-{% include game.html %}
+## game
 
+{% include game.html %}
