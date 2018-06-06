@@ -18,6 +18,4 @@ https://github.com/kbroman/simple_site
 
 ## TODO
 
-- make playable game
 - make game solve itself
-- embed video from https://www.youtube.com/watch?v=6sBB-gRhfjE
