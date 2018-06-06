@@ -1,18 +1,34 @@
 window.addEventListener('load', game, false);
 
 function game() {
-  var myCanvas = document.getElementById('myCanvas');
+  var canvas = document.getElementById('canvas');
 
-  var ctx = myCanvas.getContext('2d');
+  var ctx = canvas.getContext('2d');
+
+	const keyCodeToDirection = {
+		37: 'L',
+		40: 'D',
+		39: 'R',
+		38: 'U',
+	};
+
+	const directionToDelta = {
+		'L': [-1,  0],
+		'R': [+1,  0],
+		'U': [ 0, -1],
+		'D': [ 0, +1],
+	};
+
 
 	var edges = new Set();
-	edges.add(toKey(0, 0, 1, 0))
-	edges.add(toKey(1, 0, 2, 0))
+	var pos = [0, 0];
+	move('R');
+	move('R');
 
-	const deltas = [[0, 1], [1, 0]];
+	const drawDeltas = [[0, 1], [1, 0]];
 
 	function toKey(i1, j1, i2, j2) {
-		return `${i1},${j1},${i2},${j2}`
+		return `${i1},${j1},${i2},${j2}`;
 	}
 
 	function toScreen(x) {
@@ -20,28 +36,34 @@ function game() {
 	}
 
 	function drawLine() {
-		const args = Array.prototype.slice.call(arguments).map(toScreen)
-		ctx.moveTo.apply(ctx, args.slice(0, 2))
-		ctx.lineTo.apply(ctx, args.slice(2, 4))
+		const args = Array.prototype.slice.call(arguments).map(toScreen);
+		ctx.moveTo.apply(ctx, args.slice(0, 2));
+		ctx.lineTo.apply(ctx, args.slice(2, 4));
 	}
-  
+
+	function drawCircle(i, j) {
+		ctx.arc(toScreen(i),toScreen(j), 5, 0, 2*Math.PI);
+	}
+
   function drawScreen () {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
 		ctx.beginPath();
     ctx.lineWidth = 1;
 		ctx.strokeStyle = "#000000";
-		
-		for (i = 0; i <= 4; i++) {
-			for (j = 0; j <= 4; j++) {
-				deltas.forEach(function(delta) {
-					i2 = i + delta[0]
-					j2 = j + delta[1]
+
+		for (var i = 0; i <= 4; i++) {
+			for (var j = 0; j <= 4; j++) {
+				drawDeltas.forEach(function(delta) {
+					const i2 = i + delta[0];
+					const j2 = j + delta[1];
 					if (i2 <= 4 && j2 <= 4) {
 						drawLine(i, j, i2, j2);
 					}
-				})
+				});
 			}
 		}
-		ctx.stroke();   
+		ctx.stroke();
 		ctx.closePath();
 
 		ctx.beginPath();
@@ -50,8 +72,41 @@ function game() {
 		for (let edge of edges) {
 			drawLine.apply(null, edge.split(',').map(Number));
 		}
-		ctx.stroke();   
+		ctx.stroke();
+		ctx.closePath();
+
+		ctx.beginPath();
+		drawCircle(pos[0], pos[1]);
+		ctx.stroke();
+		ctx.closePath();
+
+		ctx.beginPath();
+		drawCircle(4, 4);
+		ctx.stroke();
 		ctx.closePath();
   }
+
   drawScreen();
+
+	function move(direction) {
+		const delta = directionToDelta[direction];
+		const ni = pos[0] + delta[0], nj = pos[1] + delta[1];
+		if (ni <= 4 && nj <= 4 && ni >= 0 && nj >= 0) {
+			const key1 = toKey(pos[0], pos[1], ni, nj);
+			const key2 = toKey(ni, nj, pos[0], pos[1]);
+			if (!edges.has(key1) && !edges.has(key2)) {
+				edges.add(key1);
+				pos = [ni, nj];
+			}
+		}
+	}
+
+	document.addEventListener('keydown', function(event) {
+		if (keyCodeToDirection.hasOwnProperty(event.keyCode)) {
+			move(keyCodeToDirection[event.keyCode]);
+			drawScreen();
+			event.preventDefault();
+		}
+		// console.log(event.keyCode);
+	}, true);
 }
