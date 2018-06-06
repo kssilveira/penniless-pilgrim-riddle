@@ -1,15 +1,19 @@
 window.addEventListener('load', game, false);
 
 function game() {
-  var canvas = document.getElementById('canvas');
+	var canvas = document.getElementById('canvas');
 
-  var ctx = canvas.getContext('2d');
+	var ctx = canvas.getContext('2d');
 
 	const keyCodeToDirection = {
 		37: 'L',
 		40: 'D',
 		39: 'R',
 		38: 'U',
+	};
+
+	const keyCodeToActionFn = {
+		82: restart,  // 'r'
 	};
 
 	const directionToDelta = {
@@ -26,12 +30,7 @@ function game() {
 		'D': function(score) { return score * 2; },
 	};
 
-
-	var edges = new Set();
-	var pos = [0, 0];
-	var score = 0;
-	move('R');
-	move('R');
+	var edges, pos, score;
 
 	const drawDeltas = [[0, 1], [1, 0]];
 
@@ -58,11 +57,20 @@ function game() {
 		ctx.fillText(text, toScreen(i), toScreen(j));
 	}
 
-  function drawScreen () {
+	function restart() {
+		edges = new Set();
+		pos = [0, 0];
+		score = 0;
+		move('R');
+		move('R');
+		drawScreen();
+	}
+
+	function drawScreen () {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		ctx.beginPath();
-    ctx.lineWidth = 1;
+		ctx.lineWidth = 1;
 		ctx.strokeStyle = "#000000";
 
 		for (var i = 0; i <= 4; i++) {
@@ -80,7 +88,7 @@ function game() {
 		ctx.closePath();
 
 		ctx.beginPath();
-    ctx.lineWidth = 5;
+		ctx.lineWidth = 5;
 		ctx.strokeStyle = "#FF0000";
 		for (let edge of edges) {
 			drawLine.apply(null, edge.split(',').map(Number));
@@ -102,16 +110,26 @@ function game() {
 		drawText(`Score: ${score}`, 0, 5);
 		ctx.stroke();
 		ctx.closePath();
-  }
 
-  drawScreen();
+		if (pos[0] == 4 && pos[1] == 4) {
+			ctx.beginPath();
+			if (score == 0) {
+				drawText('Success! 🙌', 0, 6);
+			} else {
+				drawText('Failure! 🤷', 0, 6);
+			}
+			ctx.stroke();
+			ctx.closePath();
+		}
+	}
 
 	function move(direction) {
 		const delta = directionToDelta[direction];
-		const ni = pos[0] + delta[0], nj = pos[1] + delta[1];
-		if (ni <= 4 && nj <= 4 && ni >= 0 && nj >= 0) {
-			const key1 = toKey(pos[0], pos[1], ni, nj);
-			const key2 = toKey(ni, nj, pos[0], pos[1]);
+		const i = pos[0], j = pos[1];
+		const ni = i + delta[0], nj = j + delta[1];
+		if (ni <= 4 && nj <= 4 && ni >= 0 && nj >= 0 && (i != 4 || j != 4)) {
+			const key1 = toKey(i, j, ni, nj);
+			const key2 = toKey(ni, nj, i, j);
 			if (!edges.has(key1) && !edges.has(key2)) {
 				edges.add(key1);
 				pos = [ni, nj];
@@ -120,11 +138,16 @@ function game() {
 		}
 	}
 
+	restart();
+
 	document.addEventListener('keydown', function(event) {
-		if (keyCodeToDirection.hasOwnProperty(event.keyCode)) {
-			move(keyCodeToDirection[event.keyCode]);
+		const code = event.keyCode;
+		if (keyCodeToDirection.hasOwnProperty(code)) {
+			move(keyCodeToDirection[code]);
 			drawScreen();
 			event.preventDefault();
+		} else if (keyCodeToActionFn.hasOwnProperty(code)) {
+			keyCodeToActionFn[code]();
 		}
 		// console.log(event.keyCode);
 	}, true);
