@@ -5,6 +5,10 @@
 
 goal: get to the bottom right with a score of 0
 
+## game
+
+{% include game.html %}
+
 ## rules
 
 - your score increases by 2 every time you move right, and decreases by 2 every time you move left
@@ -12,11 +16,7 @@ goal: get to the bottom right with a score of 0
 - you can only move once over each edge
 - you may pass over the same intersection twice
 
-## game
-
-{% include game.html %}
-
-### keyboard controls
+## keyboard controls
 
 - use arrow keys to move
 - press 'r' to reset
