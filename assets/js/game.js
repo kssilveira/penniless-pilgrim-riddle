@@ -5,6 +5,8 @@ function game() {
 
 	var ctx = canvas.getContext('2d');
 
+	const directions = ['L', 'D', 'R', 'U'];
+
 	const keyCodeToDirection = {
 		37: 'L',
 		40: 'D',
@@ -90,7 +92,7 @@ function game() {
 		ctx.beginPath();
 		ctx.lineWidth = 5;
 		ctx.strokeStyle = "#FF0000";
-		for (let edge of edges) {
+		for (var edge of edges) {
 			drawLine.apply(null, edge.split(',').map(Number));
 		}
 		ctx.stroke();
@@ -111,9 +113,10 @@ function game() {
 		ctx.stroke();
 		ctx.closePath();
 
-		if (pos[0] == 4 && pos[1] == 4) {
+		const [isEnd, isSuccess] = isFinished();
+		if (isEnd) {
 			ctx.beginPath();
-			if (score == 0) {
+			if (isSuccess) {
 				drawText('Success! 🙌', 0, 6);
 			} else {
 				drawText('Failure! 🤷', 0, 6);
@@ -123,18 +126,45 @@ function game() {
 		}
 	}
 
-	function move(direction) {
+	function isFinished() {
+		if (pos[0] == 4 && pos[1] == 4) {
+			if (score == 0) {
+				return [true, true];
+			} else {
+				return [true, false];
+			}
+		}
+		const len = directions.length;
+		for (var i = 0; i < len; i++) {
+			const direction = directions[i];
+			const [isValid] = canMove(direction);
+			if (isValid) {
+				return [false];
+			}
+		};
+		return [true, false];
+	}
+
+	function canMove(direction) {
 		const delta = directionToDelta[direction];
-		const i = pos[0], j = pos[1];
+		const [i, j] = pos;
 		const ni = i + delta[0], nj = j + delta[1];
 		if (ni <= 4 && nj <= 4 && ni >= 0 && nj >= 0 && (i != 4 || j != 4)) {
 			const key1 = toKey(i, j, ni, nj);
 			const key2 = toKey(ni, nj, i, j);
 			if (!edges.has(key1) && !edges.has(key2)) {
-				edges.add(key1);
-				pos = [ni, nj];
-				score = directionToScoreFn[direction](score);
+				return [true, ni, nj, key1]
 			}
+		}
+		return [false]
+	}
+
+	function move(direction) {
+		const [isValid, ni, nj, key] = canMove(direction);
+		if (isValid) {
+			edges.add(key);
+			pos = [ni, nj];
+			score = directionToScoreFn[direction](score);
 		}
 	}
 
