@@ -131,9 +131,9 @@ function game() {
 		if (isEnd) {
 			ctx.beginPath();
 			if (isSuccess) {
-				drawText('Success! 🙌', 0, 6);
+				drawText('Success! 😎', 0, 6);
 			} else {
-				drawText('Failure! 🤷', 0, 6);
+				drawText('Failure! 😒', 0, 6);
 			}
 			ctx.stroke();
 			ctx.closePath();
