@@ -55,7 +55,7 @@ function game() {
 	}
 
 	function drawText(text, i, j) {
-		ctx.font = "30px Arial";
+		ctx.font = "30px Courier New";
 		ctx.fillText(text, toScreen(i), toScreen(j));
 	}
 
@@ -110,6 +110,14 @@ function game() {
 
 		ctx.beginPath();
 		drawText(`Score: ${score}`, 0, 5);
+		ctx.stroke();
+		ctx.closePath();
+
+		ctx.beginPath();
+		drawText('÷2', 6, 1);
+		drawText('-2', 5, 2);
+		drawText('+2', 7, 2);
+		drawText('x2', 6, 3);
 		ctx.stroke();
 		ctx.closePath();
 
