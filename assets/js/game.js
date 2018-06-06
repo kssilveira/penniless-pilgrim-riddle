@@ -203,6 +203,7 @@ function game() {
 	}, true);
 
 	document.getElementById('btn-reset').onclick = restart;
+	document.getElementById('btn-random').onclick = random;
 	var startBtn = document.getElementById('btn-start');
 	startBtn.onclick = toggleStart;
 
@@ -222,4 +223,32 @@ function game() {
 			drawScreen();
 		};
 	});
+
+	function random() {
+		if (!isStarted) {
+			return
+		}
+		const perm = directions.slice();
+		const len = directions.length;
+		var found = false;
+		for (var i = 0; i < len; i++) {
+			const j = i + Math.floor(Math.random() * (len - i));
+			const tmp = perm[i];
+			perm[i] = perm[j];
+			perm[j] = tmp;
+			const direction = perm[i];
+			const [isValid] = canMove(direction);
+			if (isValid) {
+				move(direction);
+				drawScreen();
+				found = true;
+				setTimeout(random, 1000);
+				break;
+			}
+		};
+		if (!found) {
+			restart();
+			setTimeout(random, 1000);
+		}
+	}
 }
