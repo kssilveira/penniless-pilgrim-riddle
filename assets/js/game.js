@@ -19,9 +19,17 @@ function game() {
 		'D': [ 0, +1],
 	};
 
+	const directionToScoreFn = {
+		'L': function(score) { return score - 2; },
+		'R': function(score) { return score + 2; },
+		'U': function(score) { return score / 2.0; },
+		'D': function(score) { return score * 2; },
+	};
+
 
 	var edges = new Set();
 	var pos = [0, 0];
+	var score = 0;
 	move('R');
 	move('R');
 
@@ -43,6 +51,11 @@ function game() {
 
 	function drawCircle(i, j) {
 		ctx.arc(toScreen(i),toScreen(j), 5, 0, 2*Math.PI);
+	}
+
+	function drawText(text, i, j) {
+		ctx.font = "30px Arial";
+		ctx.fillText(text, toScreen(i), toScreen(j));
 	}
 
   function drawScreen () {
@@ -84,6 +97,11 @@ function game() {
 		drawCircle(4, 4);
 		ctx.stroke();
 		ctx.closePath();
+
+		ctx.beginPath();
+		drawText(`Score: ${score}`, 0, 5);
+		ctx.stroke();
+		ctx.closePath();
   }
 
   drawScreen();
@@ -97,6 +115,7 @@ function game() {
 			if (!edges.has(key1) && !edges.has(key2)) {
 				edges.add(key1);
 				pos = [ni, nj];
+				score = directionToScoreFn[direction](score);
 			}
 		}
 	}
