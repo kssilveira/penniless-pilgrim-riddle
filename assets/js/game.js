@@ -133,7 +133,7 @@ function game() {
 			if (isSuccess) {
 				drawText('Success! 😎', 0, 6);
 			} else {
-				drawText('Failure! 😒', 0, 6);
+				drawText('Failure! 💩', 0, 6);
 			}
 			ctx.stroke();
 			ctx.closePath();
