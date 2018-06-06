@@ -5,6 +5,8 @@ function game() {
 
 	var ctx = canvas.getContext('2d');
 
+	var isStarted = true;
+
 	const directions = ['L', 'D', 'R', 'U'];
 
 	const keyCodeToDirection = {
@@ -16,6 +18,7 @@ function game() {
 
 	const keyCodeToActionFn = {
 		82: restart,  // 'r'
+		83: toggleStart,  // 's'
 	};
 
 	const directionToDelta = {
@@ -60,6 +63,9 @@ function game() {
 	}
 
 	function restart() {
+		if (!isStarted) {
+			return
+		}
 		edges = new Set();
 		pos = [0, 0];
 		score = 0;
@@ -168,6 +174,9 @@ function game() {
 	}
 
 	function move(direction) {
+		if (!isStarted) {
+			return
+		}
 		const [isValid, ni, nj, key] = canMove(direction);
 		if (isValid) {
 			edges.add(key);
@@ -179,6 +188,9 @@ function game() {
 	restart();
 
 	document.addEventListener('keydown', function(event) {
+		if (!isStarted) {
+			return
+		}
 		const code = event.keyCode;
 		if (keyCodeToDirection.hasOwnProperty(code)) {
 			move(keyCodeToDirection[code]);
@@ -187,6 +199,27 @@ function game() {
 		} else if (keyCodeToActionFn.hasOwnProperty(code)) {
 			keyCodeToActionFn[code]();
 		}
-		// console.log(event.keyCode);
+		console.log(event.keyCode);
 	}, true);
+
+	document.getElementById('btn-reset').onclick = restart;
+	var startBtn = document.getElementById('btn-start');
+	startBtn.onclick = toggleStart;
+
+	function toggleStart() {
+		if (isStarted) {
+			startBtn.innerText = "start";
+			isStarted = false;
+		} else {
+			startBtn.innerText = "stop";
+			isStarted = true;
+		}
+	}
+
+	directions.forEach(function(direction) {
+		document.getElementById(`btn-${direction}`).onclick = function() {
+			move(direction);
+			drawScreen();
+		};
+	});
 }

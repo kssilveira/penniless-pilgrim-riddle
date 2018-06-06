@@ -16,10 +16,11 @@ goal: get to the bottom right with a score of 0
 
 {% include game.html %}
 
-### controls
+### keyboard controls
 
 - use arrow keys to move
-- press 'r' to restart
+- press 'r' to reset
+- press 's' to stop
 
 ## video
 
