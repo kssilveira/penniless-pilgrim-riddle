@@ -1,6 +1,8 @@
 ---
 ---
 
+{% include analytics.html %}
+
 # penniless pilgrim riddle
 
 goal: get to the bottom right with a score of 0
